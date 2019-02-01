@@ -15,21 +15,22 @@ public class ScheduledItem {
     private long interval;
     private int retryCount;
     private long retryInterval;
+    private boolean interruptStalledThread;
     private Thread thread;
     private boolean interrupted = false;
 
-    public ScheduledItem(Object targetObject, Method targetMethod, long offset, long interval, int retryCount, long retryInterval) {
+    public ScheduledItem(Object targetObject, Method targetMethod, long offset, long interval, int retryCount, long retryInterval, boolean interruptStalledThread) {
         this.targetObject = targetObject;
         this.targetMethod = targetMethod;
         this.offset = offset;
         this.interval = interval;
         this.retryCount = retryCount;
         this.retryInterval = retryInterval;
+        this.interruptStalledThread = interruptStalledThread;
     }
 
     public boolean isTime(long currentTime) {
         return (currentTime - offset) % interval == 0;
-
     }
 
     public long timeToNext(long currentTime) {
@@ -72,7 +73,20 @@ public class ScheduledItem {
     }
 
     public void invoke() {
-        if (thread == null && !interrupted) {
+        if (interrupted) {
+            return;
+        }
+        if (thread == null || interruptStalledThread) {
+            if (thread != null) {
+                logger.info("Interrupting stalled invoker thread.");
+                try {
+                    thread.interrupt();
+                    thread = null;
+                } catch (Throwable t) {
+                    logger.info("Ignoring exception " + t + " interrupting thread.");
+                }
+            }
+
             thread = new Thread(() -> {
                 try {
                     int count = 0;

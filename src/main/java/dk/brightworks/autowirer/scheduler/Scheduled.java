@@ -9,4 +9,5 @@ public @interface Scheduled {
     String offset() default "";
     int retryCount() default 0;
     String retryInterval() default "PT0S";
+    boolean interruptStalledThread() default false;
 }

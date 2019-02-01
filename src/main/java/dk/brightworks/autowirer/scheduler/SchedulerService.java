@@ -38,7 +38,8 @@ public class SchedulerService {
                             annotation.offset().equals("") ? currentTime : java.time.LocalTime.parse(annotation.offset()).toSecondOfDay() * 1000L,
                             Duration.parse(annotation.interval()).toMillis(),
                             annotation.retryCount(),
-                            Duration.parse(annotation.retryInterval()).toMillis()
+                            Duration.parse(annotation.retryInterval()).toMillis(),
+                            annotation.interruptStalledThread()
                     ));
                 }
             }
