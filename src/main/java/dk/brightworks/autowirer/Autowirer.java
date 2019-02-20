@@ -3,6 +3,7 @@ package dk.brightworks.autowirer;
 import dk.brightworks.autowirer.invocation.MethodInvocation;
 import dk.brightworks.autowirer.invocation.MethodInvocationFilter;
 import dk.brightworks.autowirer.scheduler.SchedulerService;
+import dk.brightworks.autowirer.utils.AutowirerUtils;
 import dk.brightworks.autowirer.wire.Factory;
 import dk.brightworks.autowirer.wire.Init;
 import dk.brightworks.autowirer.wire.Shutdown;
@@ -85,5 +86,13 @@ public class Autowirer {
 
     public void invoke(MethodInvocation invocation) {
         invocation.invokeWithFilters(lookupInstances(MethodInvocationFilter.class));
+    }
+
+    public void autowireObject(Object object) {
+        try {
+            AutowirerUtils.autowireFields(object, services);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

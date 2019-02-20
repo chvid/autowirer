@@ -125,14 +125,19 @@ public class AutowirerUtils {
         return result;
     }
 
+    public static void autowireFields(Object object, List<Object> services) throws IllegalAccessException {
+        for (Field f : object.getClass().getDeclaredFields()) {
+            if (f.isAnnotationPresent(Autowired.class)) {
+                f.setAccessible(true);
+                f.set(object, lookupInstanceByClass(services, f.getType()));
+            }
+        }
+
+    }
+
     public static void autowireFields(List<Object> services) throws IllegalAccessException {
         for (Object o : services) {
-            for (Field f : o.getClass().getDeclaredFields()) {
-                if (f.isAnnotationPresent(Autowired.class)) {
-                    f.setAccessible(true);
-                    f.set(o, lookupInstanceByClass(services, f.getType()));
-                }
-            }
+            autowireFields(o, services);
         }
     }
 }
