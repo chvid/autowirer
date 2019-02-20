@@ -69,7 +69,7 @@ public class Autowirer {
             servicesFromFactory.addAll(readFactoryFields(services));
             servicesFromFactory.addAll(invokeMethodsWithAnnontation(Factory.class, services));
             services.addAll(servicesFromFactory);
-            autowireFields(services);
+            AutowirerUtils.autowireFields(services);
             invokeMethodsWithAnnontation(Init.class, sortServicesByOrder(services));
         } catch (Throwable t) {
             throw new RuntimeException(t);
@@ -88,7 +88,7 @@ public class Autowirer {
         invocation.invokeWithFilters(lookupInstances(MethodInvocationFilter.class));
     }
 
-    public void autowireObject(Object object) {
+    public void autowireFields(Object object) {
         try {
             AutowirerUtils.autowireFields(object, services);
         } catch (IllegalAccessException e) {
