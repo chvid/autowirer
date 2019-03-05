@@ -33,6 +33,7 @@ import static dk.brightworks.autowirer.utils.AutowirerUtils.*;
 @SuppressWarnings("unchecked")
 public class Autowirer {
     private List<Object> services = new ArrayList<>();
+    private boolean initialized;
 
     public Autowirer() {
         services.add(this);
@@ -71,6 +72,7 @@ public class Autowirer {
             services.addAll(servicesFromFactory);
             AutowirerUtils.autowireFields(services);
             invokeMethodsWithAnnontation(Init.class, sortServicesByOrder(services));
+            initialized = true;
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
@@ -94,5 +96,9 @@ public class Autowirer {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 }
