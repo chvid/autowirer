@@ -101,4 +101,34 @@ public class SchedulerServiceTest {
         autowirer.shutdown();
         assertEquals(2, count);
     }
+
+    public class C5 {
+        @Scheduled(
+                interval = "PT1S",
+                interruptStalledThread = true
+        )
+        public void exectute() throws InterruptedException {
+            count ++;
+        }
+    }
+
+    @Ignore
+    @Test
+    public void multipleRequests() throws InterruptedException {
+        Autowirer autowirer = new Autowirer();
+        autowirer.add(new C5());
+        autowirer.init();
+        Thread.sleep(4500L);
+        autowirer.shutdown();
+        assertEquals(5, count);
+    }
+
+    @Test
+    public void schecduleItem() {
+        ScheduledItem si = new ScheduledItem(null, null, 0, 1000, 0, 0, false);
+        assertEquals(true, si.isTime(1000));
+        assertEquals(false, si.isTime(1001));
+        assertEquals(1, si.timeToNext(1001));
+        assertEquals(1000, si.timeToNext(1000));
+    }
 }

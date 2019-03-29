@@ -34,7 +34,7 @@ public class ScheduledItem {
     }
 
     public long timeToNext(long currentTime) {
-        return interval - (currentTime - offset) % interval;
+        return isTime(currentTime) ? interval : (currentTime - offset) % interval;
     }
 
     public Object getTargetObject() {

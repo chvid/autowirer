@@ -63,7 +63,10 @@ public class SchedulerService {
 
                         logger.info("Sleeping " + Duration.ofMillis(timeToSleep) + " until " + new Date(timeToSleep + currentTime) + " ...");
 
-                        Thread.sleep(Math.max(0, timeToSleep - System.currentTimeMillis() + currentTime));
+                        // Thread.sleep(Math.max(0, timeToSleep - System.currentTimeMillis() + currentTime));
+
+                        Thread.sleep(timeToSleep);
+
                         currentTime += timeToSleep;
                     }
                 } catch (InterruptedException t) {
