@@ -3,6 +3,7 @@ package dk.brightworks.autowirer;
 import dk.brightworks.autowirer.invocation.MethodInvocation;
 import dk.brightworks.autowirer.invocation.MethodInvocationFilter;
 import dk.brightworks.autowirer.scheduler.SchedulerService;
+import dk.brightworks.autowirer.utils.AutowirerUtils;
 import dk.brightworks.autowirer.wire.Factory;
 import dk.brightworks.autowirer.wire.Init;
 import dk.brightworks.autowirer.wire.Shutdown;
@@ -32,6 +33,7 @@ import static dk.brightworks.autowirer.utils.AutowirerUtils.*;
 @SuppressWarnings("unchecked")
 public class Autowirer {
     private List<Object> services = new ArrayList<>();
+    private boolean initialized;
 
     public Autowirer() {
         services.add(this);
@@ -68,8 +70,9 @@ public class Autowirer {
             servicesFromFactory.addAll(readFactoryFields(services));
             servicesFromFactory.addAll(invokeMethodsWithAnnontation(Factory.class, services));
             services.addAll(servicesFromFactory);
-            autowireFields(services);
+            AutowirerUtils.autowireFields(services);
             invokeMethodsWithAnnontation(Init.class, sortServicesByOrder(services));
+            initialized = true;
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
@@ -85,5 +88,17 @@ public class Autowirer {
 
     public void invoke(MethodInvocation invocation) {
         invocation.invokeWithFilters(lookupInstances(MethodInvocationFilter.class));
+    }
+
+    public void autowireFields(Object object) {
+        try {
+            AutowirerUtils.autowireFields(object, services);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 }
